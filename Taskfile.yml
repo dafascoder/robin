@@ -1,0 +1,51 @@
+version: "3"
+
+dotenv:
+  - backend/.env
+
+env:
+  PORT: 8080
+
+vars:
+  container_name: app
+  container_tag: latest
+
+tasks:
+  docker:
+    run: always
+    cmds:
+      - cd backend && docker-compose up -d
+  docker-down:
+    run: always
+    cmds:
+      - cd backend && docker-compose down
+  dev:
+    run: always
+    cmds:
+      - cd backend && air
+
+  migrate:create:
+    desc: Creates .sql migration files (Up and Down). Set name by appending with 'NAME=name_of_file'
+    vars:
+      name: "{{.NAME}}"
+    cmds:
+      - cd backend && goose -dir migrations postgres "user=$DB_USERNAME password=$DB_PASSWORD dbname=$DB_NAME host=$DB_HOST port=$DB_PORT sslmode=$DB_SSLMODE" create {{.name}} sql
+
+  migrate:
+    desc: Migrates UP the database
+    cmds:
+      - cd backend && goose -dir migrations postgres "user=$DB_USERNAME password=$DB_PASSWORD dbname=$DB_NAME host=$DB_HOST port=$DB_PORT sslmode=$DB_SSLMODE" up
+
+  migrate:step:
+    desc: Migrates UP bt one step the database
+    cmds:
+      - cd backend && goose -dir migrations postgres "user=$DB_USERNAME password=$DB_PASSWORD dbname=$DB_NAME host=$DB_HOST port=$DB_PORT sslmode=$DB_SSLMODE" up-by-one
+
+  migrate:rollback:
+    desc: Rollback the database by one step
+    cmds:
+      - cd backend && goose -dir migrations postgres "user=$DB_USERNAME password=$DB_PASSWORD dbname=$DB_NAME host=$DB_HOST port=$DB_PORT sslmode=$DB_SSLMODE" down
+
+  sql:generate:
+    cmds:
+      - cd backend && sqlc generate
