@@ -5,6 +5,8 @@
 static/style.css
 .idea
 
+backend/.DS_Store
+
 #
 # Binaries for programs and plugins
 *.exe
@@ -31,7 +33,7 @@ go.work
 node_modules
 
 # air build files
-tmp
+backend/tmp
 
 # task file temporary files
 .task
@@ -40,5 +42,5 @@ tmp
 *_templ.go
 
 # secrets
-.env
-.env.local
+backend/.env
+backend/.env.local
