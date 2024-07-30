@@ -1,0 +1,71 @@
+package database
+
+import (
+	"context"
+	"github.com/testcontainers/testcontainers-go"
+	"log"
+	"testing"
+	"time"
+
+	"github.com/testcontainers/testcontainers-go/modules/postgres"
+	"github.com/testcontainers/testcontainers-go/wait"
+)
+
+func mustStartPostgresContainer() (func(context.Context) error, error) {
+	var (
+		dbName = "database"
+		dbPwd  = "password"
+		dbUser = "user"
+	)
+
+	dbContainer, err := postgres.Run(
+		context.Background(),
+		"postgres:latest",
+		postgres.WithDatabase(dbName),
+		postgres.WithUsername(dbUser),
+		postgres.WithPassword(dbPwd),
+		testcontainers.WithWaitStrategy(
+			wait.ForLog("database system is ready to accept connections").
+				WithOccurrence(2).
+				WithStartupTimeout(5*time.Second)),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = dbContainer.Host(context.Background())
+	if err != nil {
+		return dbContainer.Terminate, err
+	}
+
+	_, err = dbContainer.MappedPort(context.Background(), "5432/tcp")
+	if err != nil {
+		return dbContainer.Terminate, err
+	}
+
+	return dbContainer.Terminate, err
+}
+
+func TestMain(m *testing.M) {
+	teardown, err := mustStartPostgresContainer()
+	if err != nil {
+		log.Fatalf("could not start postgres container: %v", err)
+	}
+
+	m.Run()
+
+	if teardown != nil && teardown(context.Background()) != nil {
+		log.Fatalf("could not teardown postgres container: %v", err)
+	}
+}
+
+func TestClose(t *testing.T) {
+	database, err := New()
+	if err != nil {
+		t.Fatalf("expected New() to return nil")
+	}
+
+	if database.Close() != nil {
+		t.Fatalf("expected Close() to return nil")
+	}
+}
