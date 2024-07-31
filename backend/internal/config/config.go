@@ -7,14 +7,17 @@ import (
 )
 
 type Config struct {
-	DBHost    string
-	DBPort    int
-	DBName    string
-	DBUser    string
-	DBPass    string
-	Port      int
-	DBSSL     bool
-	RESENDAPI string
+	DBHost       string
+	DBPort       int
+	DBName       string
+	DBUser       string
+	DBPass       string
+	Port         int
+	DBSSL        bool
+	RESENDAPI    string
+	DATABASEURL  string
+	AuthToken    string
+	RefreshToken string
 }
 
 var Env = initConfig()
@@ -25,14 +28,17 @@ const (
 
 func initConfig() Config {
 	return Config{
-		DBHost:    getEnvOrError("DB_HOST"),
-		DBPort:    getEnvAsInt("DB_PORT", fallbackDBPort),
-		DBName:    getEnvOrError("DB_NAME"),
-		DBUser:    getEnvOrError("DB_USERNAME"),
-		DBPass:    getEnvOrError("DB_PASSWORD"),
-		DBSSL:     getEnvAsBool("DB_SSLMODE", false),
-		Port:      getEnvAsInt("PORT", 8080),
-		RESENDAPI: getEnvOrError("RESEND_API"),
+		DBHost:       getEnvOrError("DB_HOST"),
+		DBPort:       getEnvAsInt("DB_PORT", fallbackDBPort),
+		DBName:       getEnvOrError("DB_NAME"),
+		DBUser:       getEnvOrError("DB_USERNAME"),
+		DBPass:       getEnvOrError("DB_PASSWORD"),
+		DBSSL:        getEnvAsBool("DB_SSLMODE", false),
+		Port:         getEnvAsInt("PORT", 8080),
+		RESENDAPI:    getEnvOrError("RESEND_API"),
+		DATABASEURL:  getEnvOrError("DATABASE_URL"),
+		AuthToken:    getEnvOrError("AUTH_TOKEN_SECRET"),
+		RefreshToken: getEnvOrError("REFRESH_TOKEN_SECRET"),
 	}
 }
 

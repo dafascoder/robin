@@ -4,14 +4,11 @@ import (
 	"backend/internal/config"
 	"backend/internal/middleware"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 )
 
 func NewServer(router *http.ServeMux) *http.Server {
-
-	log.Printf("Server is running on port %d", config.Env.Port)
 
 	middlewareChain := middleware.Chain(middleware.LoggingMiddleware)
 

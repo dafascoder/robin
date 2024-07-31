@@ -13,8 +13,6 @@ import (
 	"context"
 	"errors"
 	"github.com/joho/godotenv"
-	"log"
-
 	"net/http"
 	"os"
 	"os/signal"
@@ -29,16 +27,19 @@ func main() {
 
 	logger := logging.NewLogger()
 
-	db, err := database.New()
+	db, err := database.NewDatabase(context.Background())
+
 	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+		logger.LogFatal().Msgf("Failed to connect to database: %v", err)
 	}
 
-	queries := model.New(db)
+	defer db.Close()
+
+	queries := model.New(db.GetDatabaseInstance())
 
 	resendMailClient := mail.NewMailClient()
 
-	authRepo := repositories.NewAuthRepository(db, queries)
+	authRepo := repositories.NewAuthRepository(queries)
 
 	authService := services.NewAuthServices(authRepo, resendMailClient)
 
@@ -48,6 +49,10 @@ func main() {
 
 	app := server.NewServer(router)
 
+	// Channel to listen for OS signals
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
+
 	// Start the server in a goroutine
 	go func() {
 		if err := app.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
@@ -55,20 +60,22 @@ func main() {
 		}
 	}()
 
-	// Channel to listen for OS signals
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, os.Interrupt)
+	logger.LogInfo().Msgf("Server started on port %s", os.Getenv("PORT"))
 
 	// Wait for the interrupt signal
 	<-quit
+	logging.Logger.LogInfo().Msg("Shutting down server...")
 
 	// Create a context with a timeout for the shutdown
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+	defer func() {
+		cancel()
+		db.Close()
+	}()
 
 	// Attempt to gracefully shutdown the server
 	if err := app.Shutdown(ctx); err != nil {
-		log.Fatalf("Failed to shutdown server: %v", err)
+		logger.LogFatal().Msgf("Failed to shutdown server: %v", err)
 	}
 
 }

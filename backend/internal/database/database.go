@@ -2,34 +2,42 @@ package database
 
 import (
 	"backend/internal/config"
-	"database/sql"
+	logging "backend/internal/logger"
+	"context"
 	"fmt"
-	_ "github.com/lib/pq"
-	"log"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Database struct {
-	db *sql.DB
+	db *pgxpool.Pool
 }
 
-func New() (*sql.DB, error) {
-	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		config.Env.DBHost, config.Env.DBPort, config.Env.DBUser, config.Env.DBPass, config.Env.DBName)
+var dbInstance *Database
 
-	// open database
-	db, err := sql.Open("postgres", psqlconn)
-	CheckError(err)
-
-	return db, nil
-}
-
-func CheckError(err error) {
+func NewDatabase(ctx context.Context) (*Database, error) {
+	db, err := pgxpool.New(ctx, config.Env.DATABASEURL)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
+
+	logging.Logger.LogDebug().Msg("Connected to database")
+
+	dbInstance = &Database{
+		db: db,
+	}
+
+	return dbInstance, nil
 }
 
-func (d *Database) Close() error {
-	log.Printf("Disconnected from database: %s", config.Env.DBName)
-	return d.Close()
+func (pg *Database) GetDatabaseInstance() *pgxpool.Pool {
+	return dbInstance.db
+}
+
+func (pg *Database) Ping(ctx context.Context) error {
+	logging.Logger.LogDebug().Msg("Pinging database")
+	return pg.db.Ping(ctx)
+}
+
+func (pg *Database) Close() {
+	pg.db.Close()
 }

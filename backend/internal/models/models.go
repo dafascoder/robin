@@ -5,33 +5,31 @@
 package model
 
 import (
-	"database/sql"
-
-	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Account struct {
-	ID        uuid.UUID    `json:"id"`
-	Email     string       `json:"email"`
-	Password  string       `json:"password"`
-	CreatedAt sql.NullTime `json:"created_at"`
-	UpdatedAt sql.NullTime `json:"updated_at"`
+	ID        pgtype.UUID      `json:"id"`
+	Email     string           `json:"email"`
+	Password  string           `json:"password"`
+	CreatedAt pgtype.Timestamp `json:"created_at"`
+	UpdatedAt pgtype.Timestamp `json:"updated_at"`
 }
 
 type Organization struct {
-	ID        uuid.UUID    `json:"id"`
-	Name      string       `json:"name"`
-	Info      *string      `json:"info"`
-	Image     *string      `json:"image"`
-	CreatedAt sql.NullTime `json:"created_at"`
-	UpdatedAt sql.NullTime `json:"updated_at"`
+	ID        pgtype.UUID      `json:"id"`
+	Name      string           `json:"name"`
+	Info      *string          `json:"info"`
+	Image     *string          `json:"image"`
+	CreatedAt pgtype.Timestamp `json:"created_at"`
+	UpdatedAt pgtype.Timestamp `json:"updated_at"`
 }
 
 type User struct {
-	ID        uuid.UUID    `json:"id"`
-	Name      string       `json:"name"`
-	Bio       *string      `json:"bio"`
-	Image     *string      `json:"image"`
-	CreatedAt sql.NullTime `json:"created_at"`
-	UpdatedAt sql.NullTime `json:"updated_at"`
+	ID        pgtype.UUID      `json:"id"`
+	Name      string           `json:"name"`
+	Bio       *string          `json:"bio"`
+	Image     *string          `json:"image"`
+	CreatedAt pgtype.Timestamp `json:"created_at"`
+	UpdatedAt pgtype.Timestamp `json:"updated_at"`
 }

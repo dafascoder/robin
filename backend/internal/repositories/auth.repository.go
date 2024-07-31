@@ -3,11 +3,9 @@ package repositories
 import (
 	model "backend/internal/models"
 	"context"
-	"database/sql"
 )
 
 type AuthRepository struct {
-	db      *sql.DB
 	queries *model.Queries
 }
 

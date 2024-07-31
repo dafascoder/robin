@@ -8,7 +8,7 @@ package model
 import (
 	"context"
 
-	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createAccount = `-- name: CreateAccount :one
@@ -21,12 +21,12 @@ type CreateAccountParams struct {
 }
 
 type CreateAccountRow struct {
-	ID    uuid.UUID `json:"id"`
-	Email string    `json:"email"`
+	ID    pgtype.UUID `json:"id"`
+	Email string      `json:"email"`
 }
 
 func (q *Queries) CreateAccount(ctx context.Context, arg CreateAccountParams) (CreateAccountRow, error) {
-	row := q.db.QueryRowContext(ctx, createAccount, arg.Email, arg.Password)
+	row := q.db.QueryRow(ctx, createAccount, arg.Email, arg.Password)
 	var i CreateAccountRow
 	err := row.Scan(&i.ID, &i.Email)
 	return i, err
@@ -38,7 +38,7 @@ WHERE email = $1 LIMIT 1
 `
 
 func (q *Queries) GetAccountByEmail(ctx context.Context, email string) (Account, error) {
-	row := q.db.QueryRowContext(ctx, getAccountByEmail, email)
+	row := q.db.QueryRow(ctx, getAccountByEmail, email)
 	var i Account
 	err := row.Scan(
 		&i.ID,
