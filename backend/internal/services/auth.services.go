@@ -2,9 +2,9 @@ package services
 
 import (
 	"backend/internal/forms"
-	"backend/internal/interfaces"
 	"backend/internal/mail"
 	model "backend/internal/models"
+	"backend/internal/repositories"
 	"backend/internal/utils"
 	"context"
 	"errors"
@@ -12,12 +12,12 @@ import (
 )
 
 type AuthServices struct {
-	AccountInterface interfaces.AuthInterface
-	mailClient       *mail.MailClient
+	repo       *repositories.AuthRepository
+	mailClient *mail.MailClient
 }
 
 func (s *AuthServices) CreateAccount(ctx context.Context, form forms.SignUpForm) (model.CreateAccountRow, error) {
-	_, err := s.AccountInterface.GetAccountByEmail(ctx, form.Email)
+	_, err := s.repo.GetAccountByEmail(ctx, form.Email)
 
 	if err == nil {
 		return model.CreateAccountRow{}, errors.New("email already exists")
@@ -33,7 +33,7 @@ func (s *AuthServices) CreateAccount(ctx context.Context, form forms.SignUpForm)
 		Password: newPassword,
 	}
 
-	account, err := s.AccountInterface.CreateAccount(ctx, newAccount)
+	account, err := s.repo.CreateAccount(ctx, newAccount)
 	if err != nil {
 		fmt.Print(err)
 		return model.CreateAccountRow{}, errors.New("failed to create account")

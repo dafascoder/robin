@@ -1,13 +1,13 @@
 package services
 
 import (
-	"backend/internal/interfaces"
 	"backend/internal/mail"
+	"backend/internal/repositories"
 )
 
-func NewAuthServices(authInterface interfaces.AuthInterface, mailClient *mail.MailClient) *AuthServices {
+func NewAuthServices(authRepo *repositories.AuthRepository, mailClient *mail.MailClient) *AuthServices {
 	return &AuthServices{
-		AccountInterface: authInterface,
-		mailClient:       mailClient,
+		repo:       authRepo,
+		mailClient: mailClient,
 	}
 }

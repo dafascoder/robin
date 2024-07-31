@@ -65,21 +65,17 @@ func TestGenerateJwt(t *testing.T) {
 func TestDecodeJwt(t *testing.T) {
 	// Use a fake token secret for testing
 
-	var UserID = "00000000-0000-0000-0000-000000000000"
-
-	var parsedUserID, _ = uuid.Parse(UserID)
-
 	cfg := struct {
 		AuthTokenSecret    string
 		RefreshTokenSecret string
 	}{
-		AuthTokenSecret:    "8199aa73b295dd8bab866dec57eb699bd9ba96469785029985a1c19acd95d479",
-		RefreshTokenSecret: "8199aa73b295dd8bab866dec57eb699bd9ba96469785029985a1c19acd95d479",
+		AuthTokenSecret:    "TEST_AUTH_SECRET",
+		RefreshTokenSecret: "TEST_REFRESH_SECRET",
 	}
 
 	// Test for AuthTokenClaims
 	authClaims := &AuthTokenClaims{
-		UserID: parsedUserID,
+		UserID: uuid.New(),
 	}
 
 	authToken, err := GenerateJwt(authClaims, time.Now().Add(time.Hour), cfg.AuthTokenSecret)
@@ -87,7 +83,7 @@ func TestDecodeJwt(t *testing.T) {
 		t.Errorf("Error generating auth JWT: %v", err)
 	}
 
-	decodedAuth, err := DecodeJwt(authToken, &AuthTokenClaims{}, true)
+	decodedAuth, err := DecodeJwt(authToken, &AuthTokenClaims{}, cfg.AuthTokenSecret)
 	if err != nil {
 		t.Errorf("Error decoding auth JWT: %v", err)
 	}
@@ -98,7 +94,7 @@ func TestDecodeJwt(t *testing.T) {
 
 	// Test for RefreshTokenClaims
 	refreshClaims := &RefreshTokenClaims{
-		UserID:              parsedUserID,
+		UserID:              uuid.New(),
 		RefreshTokenVersion: 1,
 	}
 
@@ -107,7 +103,7 @@ func TestDecodeJwt(t *testing.T) {
 		t.Errorf("Error generating refresh JWT: %v", err)
 	}
 
-	decodedRefresh, err := DecodeJwt(refreshToken, &RefreshTokenClaims{}, false)
+	decodedRefresh, err := DecodeJwt(refreshToken, &RefreshTokenClaims{}, cfg.RefreshTokenSecret)
 	if err != nil {
 		t.Errorf("Error decoding refresh JWT: %v", err)
 	}
@@ -117,7 +113,7 @@ func TestDecodeJwt(t *testing.T) {
 	}
 
 	// Test for invalid signing secret
-	_, err = DecodeJwt(authToken, &AuthTokenClaims{}, true)
+	_, err = DecodeJwt(authToken, &AuthTokenClaims{}, cfg.AuthTokenSecret+"invalid")
 	if err == nil {
 		t.Error("Expected error for invalid signing secret")
 	}

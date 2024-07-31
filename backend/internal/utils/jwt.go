@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"os"
 	"time"
 )
 
@@ -56,14 +55,14 @@ func GenerateJwt(claims ClaimsInterface, exp time.Time, signingSecret string) (s
 	return signedToken, nil
 }
 
-func DecodeJwt(token string, claims ClaimsInterface, authToken bool) (JWTUser, error) {
+func DecodeJwt(token string, claims ClaimsInterface, signingSecret string) (JWTUser, error) {
 	decoded, err := jwt.ParseWithClaims(token, claims, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
 		}
 
-		return []byte(os.Getenv("JWT_KEY")), nil
-	}, jwt.WithAudience("user"), jwt.WithIssuer("auth"))
+		return []byte(signingSecret), nil
+	})
 
 	if err != nil {
 		return JWTUser{}, err
