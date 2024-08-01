@@ -1,7 +1,7 @@
 package main
 
 import (
-	"backend/internal/database"
+	"backend/internal/datastore"
 	"backend/internal/handlers"
 	logging "backend/internal/logger"
 	"backend/internal/mail"
@@ -27,10 +27,15 @@ func main() {
 
 	logger := logging.NewLogger()
 
-	db, err := database.NewDatabase(context.Background())
+	db, err := datastore.NewDatabase(context.Background())
+
+	redis, _ := datastore.InitRedis()
+	if err != nil {
+		logger.LogFatal().Msgf("Failed to connect to redis: %v", err)
+	}
 
 	if err != nil {
-		logger.LogFatal().Msgf("Failed to connect to database: %v", err)
+		logger.LogFatal().Msgf("Failed to connect to datastore: %v", err)
 	}
 
 	defer db.Close()
@@ -41,7 +46,7 @@ func main() {
 
 	authRepo := repositories.NewAuthRepository(queries)
 
-	authService := services.NewAuthServices(authRepo, resendMailClient)
+	authService := services.NewAuthServices(authRepo, resendMailClient, redis)
 
 	authHandler := handlers.NewAuthHandler(authService)
 

@@ -17,7 +17,7 @@ type MailClient struct {
 }
 
 func NewMailClient() *MailClient {
-	client := resend.NewClient(config.Env.RESENDAPI)
+	client := resend.NewClient(config.Env.ResendAPI)
 
 	return &MailClient{
 		client: client,

@@ -32,17 +32,17 @@ tasks:
       - cd backend && goose -dir migrations postgres "user=$DB_USERNAME password=$DB_PASSWORD dbname=$DB_NAME host=$DB_HOST port=$DB_PORT sslmode=$DB_SSLMODE" create {{.name}} sql
 
   migrate:
-    desc: Migrates UP the database
+    desc: Migrates UP the datastore
     cmds:
       - cd backend && goose -dir migrations postgres "user=$DB_USERNAME password=$DB_PASSWORD dbname=$DB_NAME host=$DB_HOST port=$DB_PORT sslmode=$DB_SSLMODE" up
 
   migrate:step:
-    desc: Migrates UP bt one step the database
+    desc: Migrates UP bt one step the datastore
     cmds:
       - cd backend && goose -dir migrations postgres "user=$DB_USERNAME password=$DB_PASSWORD dbname=$DB_NAME host=$DB_HOST port=$DB_PORT sslmode=$DB_SSLMODE" up-by-one
 
   migrate:rollback:
-    desc: Rollback the database by one step
+    desc: Rollback the datastore by one step
     cmds:
       - cd backend && goose -dir migrations postgres "user=$DB_USERNAME password=$DB_PASSWORD dbname=$DB_NAME host=$DB_HOST port=$DB_PORT sslmode=$DB_SSLMODE" down
 

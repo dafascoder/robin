@@ -4,21 +4,29 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"time"
 )
 
 type Config struct {
-	DBHost       string
-	DBPort       int
-	DBName       string
-	DBUser       string
-	DBPass       string
-	Port         int
-	DBSSL        bool
-	RESENDAPI    string
-	DATABASEURL  string
-	AuthToken    string
-	RefreshToken string
+	DBHost          string
+	DBPort          int
+	DBName          string
+	DBUser          string
+	DBPass          string
+	Port            int
+	DatabaseSSL     bool
+	ResendAPI       string
+	DatabaseUrl     string
+	RedisUrl        string
+	AuthToken       string
+	RefreshToken    string
+	TokenExpiration struct {
+		DurationString string
+		Duration       time.Duration
+	}
 }
+
+// Token Expiration
 
 var Env = initConfig()
 
@@ -27,18 +35,32 @@ const (
 )
 
 func initConfig() Config {
+	tokexpirationStr := getEnvOrError("TOKEN_EXPIRATION")
+	duration, expErr := time.ParseDuration(tokexpirationStr)
+	if expErr != nil {
+		panic(fmt.Sprint("Invalid token expiration"))
+	}
+	
 	return Config{
 		DBHost:       getEnvOrError("DB_HOST"),
 		DBPort:       getEnvAsInt("DB_PORT", fallbackDBPort),
 		DBName:       getEnvOrError("DB_NAME"),
 		DBUser:       getEnvOrError("DB_USERNAME"),
 		DBPass:       getEnvOrError("DB_PASSWORD"),
-		DBSSL:        getEnvAsBool("DB_SSLMODE", false),
+		DatabaseSSL:  getEnvAsBool("DB_SSLMODE", false),
 		Port:         getEnvAsInt("PORT", 8080),
-		RESENDAPI:    getEnvOrError("RESEND_API"),
-		DATABASEURL:  getEnvOrError("DATABASE_URL"),
+		ResendAPI:    getEnvOrError("RESEND_API"),
+		DatabaseUrl:  getEnvOrError("DATABASE_URL"),
 		AuthToken:    getEnvOrError("AUTH_TOKEN_SECRET"),
 		RefreshToken: getEnvOrError("REFRESH_TOKEN_SECRET"),
+		RedisUrl:     getEnvOrError("REDIS_URL"),
+		TokenExpiration: struct {
+			DurationString string
+			Duration       time.Duration
+		}{
+			DurationString: tokexpirationStr,
+			Duration:       duration,
+		},
 	}
 }
 

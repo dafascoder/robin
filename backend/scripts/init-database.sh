@@ -10,7 +10,7 @@ else
 EOSQL
 fi
 
-# Check if the database already exists
+# Check if the datastore already exists
 if psql -U "$POSTGRES_USER" -d "postgres" -tAc "SELECT 1 FROM pg_database WHERE datname='$POSTGRES_DB'" | grep -q 1; then
   echo "Database '$POSTGRES_DB' already exists, skipping database creation."
 else

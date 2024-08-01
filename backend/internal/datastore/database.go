@@ -1,4 +1,4 @@
-package database
+package datastore
 
 import (
 	"backend/internal/config"
@@ -15,12 +15,12 @@ type Database struct {
 var dbInstance *Database
 
 func NewDatabase(ctx context.Context) (*Database, error) {
-	db, err := pgxpool.New(ctx, config.Env.DATABASEURL)
+	db, err := pgxpool.New(ctx, config.Env.DatabaseUrl)
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to database: %w", err)
+		return nil, fmt.Errorf("failed to connect to datastore: %w", err)
 	}
 
-	logging.Logger.LogDebug().Msg("Connected to database")
+	logging.Logger.LogDebug().Msg("Connected to datastore")
 
 	dbInstance = &Database{
 		db: db,
@@ -34,7 +34,7 @@ func (pg *Database) GetDatabaseInstance() *pgxpool.Pool {
 }
 
 func (pg *Database) Ping(ctx context.Context) error {
-	logging.Logger.LogDebug().Msg("Pinging database")
+	logging.Logger.LogDebug().Msg("Pinging datastore")
 	return pg.db.Ping(ctx)
 }
 

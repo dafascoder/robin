@@ -3,6 +3,7 @@ package repositories
 import (
 	model "backend/internal/models"
 	"context"
+	"github.com/google/uuid"
 )
 
 type AuthRepository struct {
@@ -27,6 +28,10 @@ func (ar *AuthRepository) GetAccountByEmail(ctx context.Context, email string) (
 	return data, nil
 }
 
-func (ar *AuthRepository) GetAccountByID(ctx context.Context) (model.Account, error) {
+func (ar *AuthRepository) GetAccountByID(ctx context.Context, id uuid.UUID) (model.Account, error) {
 	return model.Account{}, nil
+}
+
+func (ar *AuthRepository) VerifyAccount(ctx context.Context, token string) error {
+	return nil
 }
