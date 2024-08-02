@@ -15,7 +15,12 @@ type Database struct {
 var dbInstance *Database
 
 func NewDatabase(ctx context.Context) (*Database, error) {
-	db, err := pgxpool.New(ctx, config.Env.DatabaseUrl)
+	pgxConfig, err := pgxpool.ParseConfig(config.Env.DatabaseUrl)
+	if err != nil {
+		panic(err)
+	}
+
+	db, err := pgxpool.NewWithConfig(ctx, pgxConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to datastore: %w", err)
 	}

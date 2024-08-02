@@ -22,3 +22,12 @@ func Encode[T any](w http.ResponseWriter, r *http.Request, status int, v T) erro
 	}
 	return nil
 }
+
+type Response struct {
+	Message string `json:"message"`
+	data    interface{}
+}
+
+type ResponseError struct {
+	Message error `json:"message"`
+}

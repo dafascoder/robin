@@ -14,13 +14,13 @@ type AuthTokenClaims struct {
 
 type RefreshTokenClaims struct {
 	UserID              uuid.UUID
-	RefreshTokenVersion int64
+	RefreshTokenVersion int32
 	jwt.RegisteredClaims
 }
 
 type JWTUser struct {
 	UserID              uuid.UUID
-	RefreshTokenVersion int64
+	RefreshTokenVersion int32
 }
 
 type ClaimsInterface interface {
@@ -90,4 +90,12 @@ func DecodeJwt(token string, claims ClaimsInterface, signingSecret string) (JWTU
 		return JWTUser{}, fmt.Errorf("unsupported claims type")
 	}
 
+}
+
+func ValidateJwt(exp *time.Time) (bool, error) {
+	if time.Now().After(*exp) {
+		return false, fmt.Errorf("token expired")
+	}
+
+	return true, nil
 }

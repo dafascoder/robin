@@ -8,7 +8,7 @@ package model
 import (
 	"context"
 
-	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/google/uuid"
 )
 
 const createAccount = `-- name: CreateAccount :one
@@ -21,8 +21,8 @@ type CreateAccountParams struct {
 }
 
 type CreateAccountRow struct {
-	ID    pgtype.UUID `json:"id"`
-	Email string      `json:"email"`
+	ID    uuid.UUID `json:"id"`
+	Email string    `json:"email"`
 }
 
 func (q *Queries) CreateAccount(ctx context.Context, arg CreateAccountParams) (CreateAccountRow, error) {
@@ -33,7 +33,7 @@ func (q *Queries) CreateAccount(ctx context.Context, arg CreateAccountParams) (C
 }
 
 const getAccountByEmail = `-- name: GetAccountByEmail :one
-SELECT id, email, password, created_at, updated_at FROM account
+SELECT id, email, password, verified, refresh_token_version, created_at, updated_at FROM account
 WHERE email = $1 LIMIT 1
 `
 
@@ -44,8 +44,46 @@ func (q *Queries) GetAccountByEmail(ctx context.Context, email string) (Account,
 		&i.ID,
 		&i.Email,
 		&i.Password,
+		&i.Verified,
+		&i.RefreshTokenVersion,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
+	return i, err
+}
+
+const updateRefreshTokenVersion = `-- name: UpdateRefreshTokenVersion :one
+UPDATE account SET refresh_token_version = refresh_token_version + 1 WHERE id = $1
+RETURNING id, email, refresh_token_version
+`
+
+type UpdateRefreshTokenVersionRow struct {
+	ID                  uuid.UUID `json:"id"`
+	Email               string    `json:"email"`
+	RefreshTokenVersion int32     `json:"refresh_token_version"`
+}
+
+func (q *Queries) UpdateRefreshTokenVersion(ctx context.Context, id uuid.UUID) (UpdateRefreshTokenVersionRow, error) {
+	row := q.db.QueryRow(ctx, updateRefreshTokenVersion, id)
+	var i UpdateRefreshTokenVersionRow
+	err := row.Scan(&i.ID, &i.Email, &i.RefreshTokenVersion)
+	return i, err
+}
+
+const verifyAccount = `-- name: VerifyAccount :one
+UPDATE account SET verified = true WHERE id = $1
+RETURNING id, email, verified
+`
+
+type VerifyAccountRow struct {
+	ID       uuid.UUID `json:"id"`
+	Email    string    `json:"email"`
+	Verified *bool     `json:"verified"`
+}
+
+func (q *Queries) VerifyAccount(ctx context.Context, id uuid.UUID) (VerifyAccountRow, error) {
+	row := q.db.QueryRow(ctx, verifyAccount, id)
+	var i VerifyAccountRow
+	err := row.Scan(&i.ID, &i.Email, &i.Verified)
 	return i, err
 }

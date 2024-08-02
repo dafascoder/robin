@@ -5,19 +5,22 @@
 package model
 
 import (
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Account struct {
-	ID        pgtype.UUID      `json:"id"`
-	Email     string           `json:"email"`
-	Password  string           `json:"password"`
-	CreatedAt pgtype.Timestamp `json:"created_at"`
-	UpdatedAt pgtype.Timestamp `json:"updated_at"`
+	ID                  uuid.UUID        `json:"id"`
+	Email               string           `json:"email"`
+	Password            string           `json:"password"`
+	Verified            *bool            `json:"verified"`
+	RefreshTokenVersion int32            `json:"refresh_token_version"`
+	CreatedAt           pgtype.Timestamp `json:"created_at"`
+	UpdatedAt           pgtype.Timestamp `json:"updated_at"`
 }
 
 type Organization struct {
-	ID        pgtype.UUID      `json:"id"`
+	ID        uuid.UUID        `json:"id"`
 	Name      string           `json:"name"`
 	Info      *string          `json:"info"`
 	Image     *string          `json:"image"`
@@ -26,7 +29,8 @@ type Organization struct {
 }
 
 type User struct {
-	ID        pgtype.UUID      `json:"id"`
+	ID        uuid.UUID        `json:"id"`
+	AccountID uuid.UUID        `json:"account_id"`
 	Name      string           `json:"name"`
 	Bio       *string          `json:"bio"`
 	Image     *string          `json:"image"`

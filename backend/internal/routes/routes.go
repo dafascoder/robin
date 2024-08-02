@@ -25,6 +25,7 @@ func (r *Routes) RegisterRoutes() *http.ServeMux {
 	mux.HandleFunc("POST /login", r.AuthHandler.HandleSignIn)
 	mux.HandleFunc("POST /register", r.AuthHandler.HandleSignUp)
 	mux.HandleFunc("POST /logout", r.AuthHandler.HandleSignOut)
+	mux.HandleFunc("POST /verify", r.AuthHandler.HandleVerifyAccount)
 
 	v1 := http.NewServeMux()
 	v1.Handle("/v1/api/", http.StripPrefix("/v1/api", mux))

@@ -7,6 +7,7 @@ CREATE TABLE account
     id                    uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     email                 TEXT    NOT NULL UNIQUE,
     password              text    NOT NULL,
+    verified              boolean DEFAULT FALSE,
     refresh_token_version integer NOT NULL DEFAULT 0,
     created_at            timestamp        DEFAULT now(),
     updated_at            timestamp        DEFAULT now()

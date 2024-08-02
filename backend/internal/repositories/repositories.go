@@ -12,7 +12,7 @@ type AuthRepositoryInterface interface {
 	CreateAccount(ctx context.Context, params model.CreateAccountParams) (model.CreateAccountRow, error)
 	GetAccountByEmail(ctx context.Context, email string) (model.Account, error)
 	GetAccountByID(ctx context.Context, id uuid.UUID) (model.Account, error)
-	VerifyAccount(ctx context.Context, token string) error
+	VerifyAccount(ctx context.Context, accountID uuid.UUID) error
 }
 
 // constructors below
