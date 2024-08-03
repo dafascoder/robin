@@ -8,3 +8,9 @@ WHERE account_id = $1 LIMIT 1;
 -- name: GetUserByID :one
 SELECT * FROM "user"
 WHERE id = $1 LIMIT 1;
+
+-- name: UpdateUserByID :exec
+UPDATE "user" SET name = $2 WHERE id = $1;
+
+-- name: DeleteUserByID :exec
+DELETE FROM "user" WHERE id = $1;

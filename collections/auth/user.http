@@ -1,0 +1,6 @@
+# @no-cookie-jar
+GET http://localhost:8080/v1/api/current/user
+Content-Type: application/json
+Cookie: auth=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNoaXJ3YTI1NkBnbWFpbC5jb20iLCJpYXQiOjE2MjYwNjYwNzIsImV4cCI6MTYyNjA2NjA3Mn0.7
+
+

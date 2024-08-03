@@ -33,6 +33,15 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (CreateU
 	return i, err
 }
 
+const deleteUserByID = `-- name: DeleteUserByID :exec
+DELETE FROM "user" WHERE id = $1
+`
+
+func (q *Queries) DeleteUserByID(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.Exec(ctx, deleteUserByID, id)
+	return err
+}
+
 const getUserByAccountID = `-- name: GetUserByAccountID :one
 SELECT id, account_id, name, bio, image, created_at, updated_at FROM "user"
 WHERE account_id = $1 LIMIT 1
@@ -71,4 +80,18 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const updateUserByID = `-- name: UpdateUserByID :exec
+UPDATE "user" SET name = $2 WHERE id = $1
+`
+
+type UpdateUserByIDParams struct {
+	ID   uuid.UUID `json:"id"`
+	Name string    `json:"name"`
+}
+
+func (q *Queries) UpdateUserByID(ctx context.Context, arg UpdateUserByIDParams) error {
+	_, err := q.db.Exec(ctx, updateUserByID, arg.ID, arg.Name)
+	return err
 }

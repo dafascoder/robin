@@ -26,7 +26,6 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 			logging.Logger.LogInfo().Fields(map[string]interface{}{
 				"method": req.Method,
 				"uri":    req.URL.Path,
-				"query":  "No query",
 				"status": wrapped.statusCode,
 			}).Msg("Request")
 		} else {

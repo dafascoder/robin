@@ -45,12 +45,15 @@ func main() {
 	resendMailClient := mail.NewMailClient()
 
 	authRepo := repositories.NewAuthRepository(queries)
+	userRepo := repositories.NewUserRepository(queries)
 
 	authService := services.NewAuthServices(authRepo, resendMailClient, redis)
+	userService := services.NewUserServices(userRepo)
 
 	authHandler := handlers.NewAuthHandler(authService)
+	userHandler := handlers.NewUserHandler(userService)
 
-	router := routes.NewRoutes(authHandler).RegisterRoutes()
+	router := routes.NewRoutes(authHandler, userHandler).RegisterRoutes()
 
 	app := server.NewServer(router)
 

@@ -7,3 +7,9 @@ func NewAuthHandler(s *services.AuthServices) *AuthHandler {
 		AuthServices: s,
 	}
 }
+
+func NewUserHandler(s *services.UserServices) *UserHandler {
+	return &UserHandler{
+		UserServices: s,
+	}
+}

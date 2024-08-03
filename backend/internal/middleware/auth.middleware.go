@@ -2,12 +2,13 @@ package middleware
 
 import (
 	"backend/internal/config"
+	logging "backend/internal/logger"
 	"backend/internal/utils"
 	"net/http"
 )
 
-func AuthMiddleware(repo) http.Handler {
-	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
+func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	return func(res http.ResponseWriter, req *http.Request) {
 		//Check if the user is authenticated
 		// Grab the auth token from the request header
 		authorizationTokens := req.Cookies()
@@ -38,9 +39,13 @@ func AuthMiddleware(repo) http.Handler {
 			}
 		}
 
-		// Grab the user ID from the token
+		logging.Logger.Info().Msg("User is authenticated")
+		logging.Logger.LogInfo().Msgf("User is authenticated with email: %s", userCreds.UserID)
+		logging.Logger.LogInfo().Msgf("User is authenticated with email: %s", refreshCreds.UserID)
 
 		//If not, return an error
+		
+		//If the user is authenticated, call the next handler
 		next.ServeHTTP(res, req)
-	})
+	}
 }

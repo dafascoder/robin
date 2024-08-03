@@ -52,6 +52,28 @@ func (q *Queries) GetAccountByEmail(ctx context.Context, email string) (Account,
 	return i, err
 }
 
+const updatePassword = `-- name: UpdatePassword :one
+UPDATE account SET password = $2 WHERE id = $1
+RETURNING id, email
+`
+
+type UpdatePasswordParams struct {
+	ID       uuid.UUID `json:"id"`
+	Password string    `json:"password"`
+}
+
+type UpdatePasswordRow struct {
+	ID    uuid.UUID `json:"id"`
+	Email string    `json:"email"`
+}
+
+func (q *Queries) UpdatePassword(ctx context.Context, arg UpdatePasswordParams) (UpdatePasswordRow, error) {
+	row := q.db.QueryRow(ctx, updatePassword, arg.ID, arg.Password)
+	var i UpdatePasswordRow
+	err := row.Scan(&i.ID, &i.Email)
+	return i, err
+}
+
 const updateRefreshTokenVersion = `-- name: UpdateRefreshTokenVersion :one
 UPDATE account SET refresh_token_version = refresh_token_version + 1 WHERE id = $1
 RETURNING id, email, refresh_token_version

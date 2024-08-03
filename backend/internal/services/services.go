@@ -13,3 +13,9 @@ func NewAuthServices(authRepo *repositories.AuthRepository, mailClient *mail.Mai
 		redis:      redis,
 	}
 }
+
+func NewUserServices(userRepo *repositories.UserRepository) *UserServices {
+	return &UserServices{
+		repo: userRepo,
+	}
+}
